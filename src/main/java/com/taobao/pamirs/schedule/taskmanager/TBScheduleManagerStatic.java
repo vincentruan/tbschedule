@@ -46,42 +46,36 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
 	public void initial() throws Exception {
 		new Thread(this.currenScheduleServer.getTaskType() + "-"
 				+ this.currentSerialNumber + "-StartProcess") {
-			@SuppressWarnings("static-access")
 			public void run() {
 				try {
 					log.info("开始获取调度任务队列...... of "
 							+ currenScheduleServer.getUuid());
-					while (isRuntimeInfoInitial == false) {
-						if (isStopSchedule == true) {
-							log.debug("外部命令终止调度,退出调度队列获取："
-									+ currenScheduleServer.getUuid());
+					while (!isRuntimeInfoInitial) {
+						if (isStopSchedule) {
+							log.debug("外部命令终止调度,退出调度队列获取：" + currenScheduleServer.getUuid());
 							return;
 						}
 						//log.error("isRuntimeInfoInitial = " + isRuntimeInfoInitial);
 						try {
 							initialRunningInfo();
-							isRuntimeInfoInitial = scheduleCenter
-									.isInitialRunningInfoSucuss(
-											currenScheduleServer
-													.getBaseTaskType(),
-											currenScheduleServer.getOwnSign());
+							isRuntimeInfoInitial = scheduleCenter.isInitialRunningInfoSucuss(currenScheduleServer.getBaseTaskType(), currenScheduleServer.getOwnSign());
 						} catch (Throwable e) {
 							//忽略初始化的异常
 							log.error(e.getMessage(), e);
 						}
-						if (isRuntimeInfoInitial == false) {
-							Thread.currentThread().sleep(1000);
+						if (!isRuntimeInfoInitial) {
+							Thread.sleep(1000);
 						}
 					}
 					int count = 0;
 					lastReloadTaskItemListTime = scheduleCenter.getSystemTime();
 					while (getCurrentScheduleTaskItemListNow().size() <= 0) {
-						if (isStopSchedule == true) {
+						if (isStopSchedule) {
 							log.debug("外部命令终止调度,退出调度队列获取："
 									+ currenScheduleServer.getUuid());
 							return;
 						}
-						Thread.currentThread().sleep(1000);
+						Thread.sleep(1000);
 						count = count + 1;
 						// log.error("尝试获取调度队列，第" + count + "次 ") ;
 					}
@@ -96,8 +90,7 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
 							+ currenScheduleServer.getUuid());
 
 					//任务总量
-					taskItemCount = scheduleCenter.loadAllTaskItem(
-							currenScheduleServer.getTaskType()).size();
+					taskItemCount = scheduleCenter.loadAllTaskItem(currenScheduleServer.getTaskType()).size();
 					//只有在已经获取到任务处理队列后才开始启动任务处理器    			   
 					computerStart();
 				} catch (Exception e) {
@@ -122,7 +115,7 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
 		try {
 			rewriteScheduleInfo();
 			//如果任务信息没有初始化成功，不做任务相关的处理
-			if (this.isRuntimeInfoInitial == false) {
+			if (!this.isRuntimeInfoInitial) {
 				return;
 			}
 
@@ -139,8 +132,7 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
 				rewriteScheduleInfo();
 			}
 
-			if (this.isPauseSchedule == true || this.processor != null
-					&& processor.isSleeping() == true) {
+			if (this.isPauseSchedule || this.processor != null && processor.isSleeping()) {
 				//如果服务已经暂停了，则需要重新定时更新 cur_server 和 req_server
 				//如果服务没有暂停，一定不能调用的
 				this.getCurrentScheduleTaskItemListNow();
@@ -184,11 +176,9 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
 				.loadScheduleServerNames(this.currenScheduleServer
 						.getTaskType());
 
-		if (scheduleCenter.isLeader(this.currenScheduleServer.getUuid(),
-				serverList) == false) {
+		if (!scheduleCenter.isLeader(this.currenScheduleServer.getUuid(), serverList)) {
 			if (log.isDebugEnabled()) {
-				log.debug(this.currenScheduleServer.getUuid()
-						+ ":不是负责任务分配的Leader,直接返回");
+				log.debug(this.currenScheduleServer.getUuid() + ":不是负责任务分配的Leader,直接返回");
 			}
 			return;
 		}
@@ -216,11 +206,11 @@ public class TBScheduleManagerStatic extends TBScheduleManager {
 
 	public List<TaskItemDefine> getCurrentScheduleTaskItemList() {
 		try {
-			if (this.isNeedReloadTaskItem == true) {
+			if (this.isNeedReloadTaskItem) {
 				//特别注意：需要判断数据队列是否已经空了，否则可能在队列切换的时候导致数据重复处理
 				//主要是在线程不休眠就加载数据的时候一定需要这个判断
 				if (this.processor != null) {
-					while (this.processor.isDealFinishAllData() == false) {
+					while (!this.processor.isDealFinishAllData()) {
 						Thread.sleep(50);
 					}
 				}

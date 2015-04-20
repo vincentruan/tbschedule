@@ -79,7 +79,7 @@ public class ScheduleUtil {
 
 	public static String getTaskTypeByBaseAndOwnSign(String baseType,
 			String ownSign) {
-		if (ownSign.equals(OWN_SIGN_BASE) == true) {
+		if (ownSign.equals(OWN_SIGN_BASE)) {
 			return baseType;
 		}
 		return baseType + "$" + ownSign;

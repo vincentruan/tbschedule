@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
@@ -15,7 +16,7 @@ public class ZKTools {
 		String[] list = path.split("/");
 		String zkPath = "";
 		for (String str : list) {
-			if (str.equals("") == false) {
+			if (StringUtils.isNotEmpty(str)) {
 				zkPath = zkPath + "/" + str;
 				if (zk.exists(zkPath, false) == null) {
 					zk.create(zkPath, null, acl, createMode);
@@ -53,7 +54,7 @@ public class ZKTools {
 	   while(index < dealList.size()){
 		   String tempPath = dealList.get(index);
 		   List<String> children = zk.getChildren(tempPath, false);
-		   if(tempPath.equalsIgnoreCase("/") == false){
+		   if(!tempPath.equalsIgnoreCase("/")){
 			   tempPath = tempPath +"/";
 		   }
 		   Collections.sort(children);

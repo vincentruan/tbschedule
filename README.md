@@ -1,6 +1,18 @@
 # tbschedule
 fork from http://code.taobao.org/p/tbschedule/src/
 
+搭建zookeeper
+
+以win7X64安装单机双集群为例，
+1、复制zkEnv.cmd为zkEnv-slave1.cmd，并修改ZOOCFG=%ZOOCFGDIR%\zoo-slave1.cfg
+关于zoo.cfg的配置请自行度娘或谷歌
+2、复制zkServer.cmd为zkServer-slave1.cmd，修改call "%~dp0zkEnv-slave1.cmd"
+第二个部署适当的改下端口，运行两个zkServer即可
+
+安装方式
+cd到项目路径
+mvn install -Dmaven.test.skip=true
+
 最近有个项目需要用到一个分布式的调度任务管理工具，直接使用quartz根据之前的实践看，分布式部署的quartz会出现锁表这种不可预估的状况，这时刚好看到了淘宝这个开源的框架，GBK编码不符合项目需要，转码到UTF8后根据[DISchedule][3]进行了下自定义改造
 
 

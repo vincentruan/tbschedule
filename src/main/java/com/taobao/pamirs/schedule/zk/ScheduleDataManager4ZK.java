@@ -512,7 +512,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 			byte[] reqServerValue = this.getZooKeeper().getData(
 					zkPath + "/" + name + "/req_server", false, null);
 			if (reqServerValue != null && curServerValue != null
-					&& uuid.equals(new String(curServerValue)) == true) {
+					&& uuid.equals(new String(curServerValue))) {
 				this.getZooKeeper()
 						.setData(zkPath + "/" + name + "/cur_server",
 								reqServerValue, -1);
@@ -521,7 +521,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 				isModify = true;
 			}
 		}
-		if (isModify == true) { //设置需要所有的服务器重新装载任务
+		if (isModify) { //设置需要所有的服务器重新装载任务
 			this.updateReloadTaskItemFlag(taskType);
 		}
 	}
@@ -605,7 +605,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 						break;
 					}
 				}
-				if (isFind == false) {
+				if (!isFind) {
 					this.getZooKeeper().setData(
 							zkPath + "/" + name + "/cur_server", null, -1);
 					result = result + 1;
@@ -735,7 +735,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 	public void assignTaskItem(String taskType, String currentUuid,
 			int maxNumOfOneServer, List<String> taskServerList)
 			throws Exception {
-		if (this.isLeader(currentUuid, taskServerList) == false) {
+		if (!this.isLeader(currentUuid, taskServerList)) {
 			if (log.isDebugEnabled()) {
 				log.debug(currentUuid + ":不是负责任务分配的Leader,直接返回");
 			}
@@ -782,7 +782,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 						serverName.getBytes(), -1);
 				this.getZooKeeper().setData(
 						zkPath + "/" + name + "/req_server", null, -1);
-			} else if (new String(curServerValue).equals(serverName) == true
+			} else if (new String(curServerValue).equals(serverName)
 					&& reqServerValue == null) {
 				//不需要做任何事情
 				unModifyCount = unModifyCount + 1;
@@ -807,7 +807,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 
 	public void assignTaskItem22(String taskType, String currentUuid,
 			List<String> serverList) throws Exception {
-		if (this.isLeader(currentUuid, serverList) == false) {
+		if (!this.isLeader(currentUuid, serverList)) {
 			if (log.isDebugEnabled()) {
 				log.debug(currentUuid + ":不是负责任务分配的Leader,直接返回");
 			}
@@ -839,7 +839,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 						serverList.get(point).getBytes(), -1);
 				this.getZooKeeper().setData(
 						zkPath + "/" + name + "/req_server", null, -1);
-			} else if (new String(curServerValue).equals(serverList.get(point)) == true
+			} else if (new String(curServerValue).equals(serverList.get(point))
 					&& reqServerValue == null) {
 				//不需要做任何事情
 				unModifyCount = unModifyCount + 1;
@@ -864,7 +864,7 @@ public class ScheduleDataManager4ZK implements IScheduleDataManager {
 	}
 
 	public void registerScheduleServer(ScheduleServer server) throws Exception {
-		if (server.isRegister() == true) {
+		if (server.isRegister()) {
 			throw new Exception(server.getUuid() + " 被重复注册");
 		}
 		String zkPath = this.PATH_BaseTaskType + "/" + server.getBaseTaskType()

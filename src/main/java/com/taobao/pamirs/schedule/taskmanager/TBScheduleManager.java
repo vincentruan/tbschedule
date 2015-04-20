@@ -116,7 +116,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 			throw new Exception("SpringBean "
 					+ this.taskTypeInfo.getDealBeanName() + " 不存在");
 		}
-		if (dealBean instanceof IScheduleTaskDeal == false) {
+		if (!(dealBean instanceof IScheduleTaskDeal)) {
 			throw new Exception("SpringBean "
 					+ this.taskTypeInfo.getDealBeanName()
 					+ " 没有实现 IScheduleTaskDeal接口");
@@ -197,7 +197,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 	public void rewriteScheduleInfo() throws Exception {
 		registerLock.lock();
 		try {
-			if (this.isStopSchedule == true) {
+			if (this.isStopSchedule) {
 				if (log.isDebugEnabled()) {
 					log.debug("外部命令终止调度,不在注册调度服务，避免遗留垃圾数据："
 							+ currenScheduleServer.getUuid());
@@ -211,8 +211,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 			} else {
 				this.currenScheduleServer.setDealInfoDesc(startErrorInfo);
 			}
-			if (this.scheduleCenter
-					.refreshScheduleServer(this.currenScheduleServer) == false) {
+			if (!this.scheduleCenter.refreshScheduleServer(this.currenScheduleServer)) {
 				//更新信息失败，清除内存数据后重新注册
 				this.clearMemoInfo();
 				this.scheduleCenter
@@ -278,7 +277,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 				}
 			}
 		}
-		if (isRunNow == true) {
+		if (isRunNow) {
 			this.resume("开启服务立即启动");
 		}
 		this.rewriteScheduleInfo();
@@ -291,7 +290,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 	 * @throws Exception
 	 */
 	public boolean isContinueWhenData() throws Exception {
-		if (isPauseWhenNoData() == true) {
+		if (isPauseWhenNoData()) {
 			this.pause("没有数据,暂停调度");
 			return false;
 		} else {
@@ -320,7 +319,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 	 * @throws Exception
 	 */
 	public void pause(String message) throws Exception {
-		if (this.isPauseSchedule == false) {
+		if (!this.isPauseSchedule) {
 			this.isPauseSchedule = true;
 			this.pauseMessage = message;
 			if (log.isDebugEnabled()) {
@@ -340,7 +339,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 	 * @throws Exception
 	 */
 	public void resume(String message) throws Exception {
-		if (this.isPauseSchedule == true) {
+		if (this.isPauseSchedule) {
 			if (log.isDebugEnabled()) {
 				log.debug("恢复调度:" + this.currenScheduleServer.getUuid());
 			}
@@ -348,8 +347,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 			this.pauseMessage = message;
 			if (this.taskDealBean != null) {
 				if (this.taskTypeInfo.getProcessorType() != null
-						&& this.taskTypeInfo.getProcessorType()
-								.equalsIgnoreCase("NOTSLEEP") == true) {
+						&& this.taskTypeInfo.getProcessorType().equalsIgnoreCase("NOTSLEEP")) {
 					this.taskTypeInfo.setProcessorType("NOTSLEEP");
 					this.processor = new TBScheduleProcessorNotSleep(this,
 							taskDealBean, this.statisticsInfo);
@@ -392,7 +390,7 @@ abstract class TBScheduleManager implements IStrategyTask {
 			if (this.processor != null) {
 				this.processor = null;
 			}
-			if (this.isPauseSchedule == true) {
+			if (this.isPauseSchedule) {
 				// 是暂停调度，不注销Manager自己
 				return;
 			}

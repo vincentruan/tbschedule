@@ -140,7 +140,7 @@ public class ZKManager {
 				zk.setData(this.getRootPath(), Version.getVersion().getBytes(), -1);
 			} else {
 				String dataVersion = new String(value);
-				if (Version.isCompatible(dataVersion) == false) {
+				if (!Version.isCompatible(dataVersion)) {
 					throw new Exception("TBSchedule程序版本 "
 							+ Version.getVersion() + " 不兼容Zookeeper中的数据版本 "
 							+ dataVersion);
@@ -176,7 +176,7 @@ public class ZKManager {
 	}
 
 	public ZooKeeper getZooKeeper() throws Exception {
-		if (this.checkZookeeperState() == false) {
+		if (!this.checkZookeeperState()) {
 			reConnection();
 		}
 		return this.zk;

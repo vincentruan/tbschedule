@@ -108,8 +108,7 @@ public class ScheduleStrategyDataManager4ZK {
 	public void deleteMachineStrategy(String taskType, boolean isForce)
 			throws Exception {
 		String zkPath = this.PATH_Strategy + "/" + taskType;
-		if (isForce == false
-				&& this.getZooKeeper().getChildren(zkPath, null).size() > 0) {
+		if (!isForce && this.getZooKeeper().getChildren(zkPath, null).size() > 0) {
 			throw new Exception("不能删除" + taskType
 					+ "的运行策略，会导致必须重启整个应用才能停止失去控制的调度进程。"
 					+ "可以先清空IP地址，等所有的调度器都停止后再删除调度策略");
@@ -163,8 +162,7 @@ public class ScheduleStrategyDataManager4ZK {
 		for (ScheduleStrategy scheduleStrategy : loadAllScheduleStrategy()) {
 			boolean isFind = false;
 			//暂停或者不在IP范围
-			if (ScheduleStrategy.STS_PAUSE.equalsIgnoreCase(scheduleStrategy
-					.getSts()) == false && scheduleStrategy.getIPList() != null) {
+			if (!ScheduleStrategy.STS_PAUSE.equalsIgnoreCase(scheduleStrategy.getSts()) && scheduleStrategy.getIPList() != null) {
 				for (String ip : scheduleStrategy.getIPList()) {
 					if (ip.equals("127.0.0.1")
 							|| ip.equalsIgnoreCase("localhost")
@@ -184,7 +182,7 @@ public class ScheduleStrategyDataManager4ZK {
 					}
 				}
 			}
-			if (isFind == false) {//清除原来注册的Factory
+			if (!isFind) {//清除原来注册的Factory
 				String zkPath = this.PATH_Strategy + "/"
 						+ scheduleStrategy.getStrategyName() + "/"
 						+ managerFactory.getUuid();

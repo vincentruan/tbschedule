@@ -49,7 +49,7 @@ public class ConsoleManager {
 
 	public static TBScheduleManagerFactory getScheduleManagerFactory()
 			throws Exception {
-		if (isInitial() == false) {
+		if (!isInitial()) {
 			initial();
 		}
 		return scheduleManagerFactory;
@@ -57,7 +57,7 @@ public class ConsoleManager {
 
 	public static IScheduleDataManager getScheduleDataManager()
 			throws Exception {
-		if (isInitial() == false) {
+		if (!isInitial()) {
 			initial();
 		}
 		return scheduleManagerFactory.getScheduleDataManager();
@@ -65,7 +65,7 @@ public class ConsoleManager {
 
 	public static ScheduleStrategyDataManager4ZK getScheduleStrategyManager()
 			throws Exception {
-		if (isInitial() == false) {
+		if (!isInitial()) {
 			initial();
 		}
 		return scheduleManagerFactory.getScheduleStrategyManager();
@@ -74,7 +74,7 @@ public class ConsoleManager {
 	public static Properties loadConfig() throws IOException {
 		File file = new File(configFile);
 		Properties properties;
-		if (file.exists() == false) {
+		if (!file.exists()) {
 			properties = ZKManager.createProperties();
 		} else {
 			properties = new Properties();

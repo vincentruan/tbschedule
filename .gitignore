@@ -1,0 +1,9 @@
+/target/
+/.settings/
+*.exe
+*.exe~
+*.iml
+.idea
+*.swap
+.classpath
+.project

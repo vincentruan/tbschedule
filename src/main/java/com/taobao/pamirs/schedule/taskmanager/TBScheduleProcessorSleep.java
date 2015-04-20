@@ -297,7 +297,7 @@ class TBScheduleProcessorSleep<T> implements IScheduleProcessor, Runnable {
 							}
 						}
 					} catch (Exception ex) {
-						if (this.isMutilTask == false) {
+						if (!this.isMutilTask) {
 							addFailNum(
 									1,
 									scheduleManager.scheduleCenter.getSystemTime() - startTime,

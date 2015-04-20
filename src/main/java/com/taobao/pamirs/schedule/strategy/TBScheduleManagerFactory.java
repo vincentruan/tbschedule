@@ -80,7 +80,7 @@ public class TBScheduleManagerFactory implements ApplicationContextAware {
 	}
 
 	public void reInit(Properties p) throws Exception {
-		if (this.start == true || this.timer != null
+		if (this.start || this.timer != null
 				|| this.managerMap.size() > 0) {
 			throw new Exception("调度器有任务处理，不能重新初始化");
 		}
@@ -119,7 +119,7 @@ public class TBScheduleManagerFactory implements ApplicationContextAware {
 		this.scheduleDataManager = new ScheduleDataManager4ZK(this.zkManager);
 		this.scheduleStrategyManager = new ScheduleStrategyDataManager4ZK(
 				this.zkManager);
-		if (this.start == true) {
+		if (this.start) {
 			// 注册调度管理器
 			this.scheduleStrategyManager.registerManagerFactory(this);
 			if (timer == null) {
@@ -175,14 +175,14 @@ public class TBScheduleManagerFactory implements ApplicationContextAware {
 				logger.error(e.getMessage(), e);
 			}
 			
-			if (isException == true) {
+			if (isException) {
 				try {
 					stopServer(null); // 停止所有的调度任务
 					this.getScheduleStrategyManager().unRregisterManagerFactory(this);
 				} finally {
 					reRegisterManagerFactory();
 				}
-			} else if (stsInfo.isStart() == false) {
+			} else if (!stsInfo.isStart()) {
 				stopServer(null); // 停止所有的调度任务
 				this.getScheduleStrategyManager().unRregisterManagerFactory(this);
 			} else {
@@ -215,7 +215,7 @@ public class TBScheduleManagerFactory implements ApplicationContextAware {
 					.loadAllScheduleStrategyRunntimeByTaskType(run
 							.getStrategyName());
 			
-			if (factoryList.size() == 0	|| this.isLeader(this.uuid, factoryList) == false) {
+			if (factoryList.size() == 0	|| !this.isLeader(this.uuid, factoryList)) {
 				continue;
 			}
 			ScheduleStrategy scheduleStrategy = this.scheduleStrategyManager.loadStrategy(run.getStrategyName());
@@ -459,7 +459,7 @@ class ManagerFactoryTimerTask extends java.util.TimerTask {
 	public void run() {
 		try {
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-			if (this.factory.zkManager.checkZookeeperState() == false) {
+			if (!this.factory.zkManager.checkZookeeperState()) {
 				if (count > 5) {
 					log.error("Zookeeper连接失败，关闭所有的任务后，重新连接Zookeeper服务器......");
 					this.factory.reStart();
@@ -496,7 +496,7 @@ class InitialThread extends Thread {
 		facotry.lock.lock();
 		try {
 			int count = 0;
-			while (facotry.zkManager.checkZookeeperState() == false) {
+			while (!facotry.zkManager.checkZookeeperState()) {
 				count = count + 1;
 				if (count % 50 == 0) {
 					facotry.errorMessage = "Zookeeper connecting ......"
@@ -505,7 +505,7 @@ class InitialThread extends Thread {
 					log.error(facotry.errorMessage);
 				}
 				Thread.sleep(20);
-				if (this.isStop == true) {
+				if (this.isStop) {
 					return;
 				}
 			}

@@ -165,7 +165,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 				} else {
 					return null;
 				}
-				if (this.isDealing(result) == false) {
+				if (!this.isDealing(result)) {
 					return result;
 				}
 			}
@@ -228,7 +228,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 	protected int loadScheduleData() {
 		lockLoadData.lock();
 		try {
-			if (this.taskList.size() > 0 || this.isStopSchedule == true) { // 判断是否有别的线程已经装载过了。
+			if (this.taskList.size() > 0 || this.isStopSchedule) { // 判断是否有别的线程已经装载过了。
 				return this.taskList.size();
 			}
 			// 在每次数据处理完毕后休眠固定的时间
@@ -277,7 +277,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 						"TBScheduleProcessor.loadScheduleData");
 				if (taskList.size() <= 0) {
 					// 判断当没有数据的是否，是否需要退出调度
-					if (this.scheduleManager.isContinueWhenData() == true) {
+					if (this.scheduleManager.isContinueWhenData()) {
 						if (taskTypeInfo.getSleepTimeNoData() > 0) {
 							if (logger.isDebugEnabled()) {
 								logger.debug("没有读取到需要处理的数据,sleep "
@@ -312,7 +312,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 			}
 			Object[] tmpList = this.runningTaskList.toArray();
 			for (int i = 0; i < tmpList.length; i++) {
-				if (this.isMutilTask == false) {
+				if (!this.isMutilTask) {
 					this.maybeRepeatTaskList.add((T) tmpList[i]);
 				} else {
 					T[] aTasks = (T[]) tmpList[i];
@@ -336,7 +336,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 		Object executeTask = null;
 		while (true) {
 			try {
-				if (this.isStopSchedule == true) { // 停止队列调度
+				if (this.isStopSchedule) { // 停止队列调度
 					synchronized (this.threadList) {
 						this.threadList.remove(Thread.currentThread());
 						if (this.threadList.size() == 0) {
@@ -346,7 +346,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 					return;
 				}
 				// 加载调度任务
-				if (this.isMutilTask == false) {
+				if (!this.isMutilTask) {
 					executeTask = this.getScheduleTaskId();
 				} else {
 					executeTask = this.getScheduleTaskIdMulti();
@@ -360,10 +360,8 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 					this.runningTaskList.add(executeTask);
 					startTime = scheduleManager.scheduleCenter.getSystemTime();
 					sequence = sequence + 1;
-					if (this.isMutilTask == false) {
-						if (((IScheduleTaskDealSingle<Object>) this.taskDealBean)
-								.execute(executeTask, scheduleManager
-										.getScheduleServer().getOwnSign()) == true) {
+					if (!this.isMutilTask) {
+						if (((IScheduleTaskDealSingle<Object>) this.taskDealBean).execute(executeTask, scheduleManager.getScheduleServer().getOwnSign())) {
 							addSuccessNum(
 									1,
 									scheduleManager.scheduleCenter
@@ -380,7 +378,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 						if (((IScheduleTaskDealMulti<Object>) this.taskDealBean)
 								.execute((Object[]) executeTask,
 										scheduleManager.getScheduleServer()
-												.getOwnSign()) == true) {
+												.getOwnSign())) {
 							addSuccessNum(
 									((Object[]) executeTask).length,
 									scheduleManager.scheduleCenter
@@ -395,7 +393,7 @@ class TBScheduleProcessorNotSleep<T> implements IScheduleProcessor, Runnable {
 						}
 					}
 				} catch (Throwable ex) {
-					if (this.isMutilTask == false) {
+					if (!this.isMutilTask) {
 						addFailNum(1,
 								scheduleManager.scheduleCenter.getSystemTime()
 										- startTime, "TBScheduleProcessor.run");
