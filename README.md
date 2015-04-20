@@ -1,7 +1,9 @@
 # tbschedule
 fork from http://code.taobao.org/p/tbschedule/src/
 
-搭建zookeeper
+添加部分修改以适应自己的场景，目前引入的版本是官方2012-03-21最后提交版本
+
+# 搭建zookeeper
 
 以win7X64安装单机双集群为例，
 1、复制zkEnv.cmd为zkEnv-slave1.cmd，并修改ZOOCFG=%ZOOCFGDIR%\zoo-slave1.cfg
